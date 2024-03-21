@@ -6,7 +6,7 @@ import './movie-preview.css'
 const MoviePreview = ({ posterPath }) => {
   const URL = 'https://image.tmdb.org/t/p/original'
   return (
-    <div className="box" style={{ marginRight: 16 }}>
+    <div className="box">
       <img className="image" src={URL + posterPath} alt="Preview" />
     </div>
   )

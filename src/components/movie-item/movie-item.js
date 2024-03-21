@@ -8,6 +8,7 @@ import Genre from '../genre/genre'
 import MovieTitle from '../movie-title/movie-title'
 import MoviePreview from '../movie-preview/movie-preview'
 import { ServiceConsumer } from '../services/services-context'
+import './movie-item.css'
 
 export default class MovieItem extends Component {
   filmsRating = (voteAverage = 0) => {
@@ -27,10 +28,7 @@ export default class MovieItem extends Component {
     const { title, overview, release_date, backdrop_path, voteAverage, click, genre_ids } = this.props
 
     return (
-      <Card
-        bodyStyle={{ padding: 0, overflow: 'hidden' }}
-        style={{ width: 500, height: 281, marginBottom: 32, marginRight: 32 }}
-      >
+      <Card className="card">
         <Flex justify="space-between">
           <MoviePreview posterPath={backdrop_path} />
           <Flex vertical align="flex-start" justify="space-around">
@@ -41,14 +39,6 @@ export default class MovieItem extends Component {
               className="filmRating"
               style={{
                 border: ` 2px solid ${this.filmsRating(voteAverage)}`,
-                borderRadius: '100%',
-                width: 30,
-                height: 30,
-                position: 'absolute',
-                top: 10,
-                color: '',
-                right: 10,
-                textAlign: 'center',
               }}
             >
               {voteAverage.toFixed(1)}

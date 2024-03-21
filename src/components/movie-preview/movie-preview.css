@@ -1,16 +1,17 @@
 .box {
-	position: relative;
-	overflow: hidden;
-	width: 500px;
-	height: 281px;
+  position: relative;
+  overflow: hidden;
+  width: 300px;
+  height: 281px;
+  margin-right: 16px;
 }
 
 .box img {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	width: 500px;
-	height: 281px;
-	transform: translate(-50%, -50%);
-	object-fit: cover;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 300px;
+  height: 280px;
+  transform: translate(-50%, -50%);
+  object-fit: cover;
 }

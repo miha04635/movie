@@ -1,0 +1,17 @@
+.card {
+  width: 500px;
+  height: 320px;
+  margin-bottom: 32px;
+  margin-right: 32px;
+}
+
+.filmRating {
+  border-radius: 100%;
+  width: 30px;
+  height: 30px;
+  position: absolute;
+  top: 10px;
+  color: '';
+  right: 10px;
+  text-align: center;
+}
