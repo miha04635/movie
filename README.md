@@ -1,1 +1,1 @@
-https://vercel.com/new/mihails-projects-f13b45ac/success?developer-id=&external-id=&redirect-url=&branch=main&deploymentUrl=movie-lp6wzcpf1-mihails-projects-f13b45ac.vercel.app&projectName=movie&s=https%3A%2F%2Fgithub.com%2Fmiha04635%2Fmovie&gitOrgLimit=&hasTrialAvailable=1&totalProjects=1
+https://vercel.com/mihails-projects-f13b45ac/movie
