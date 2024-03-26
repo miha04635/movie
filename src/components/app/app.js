@@ -1,19 +1,22 @@
 import React, { Component } from 'react'
 import { Flex, Tabs } from 'antd'
-import { Offline, Online } from 'react-detect-offline'
+import { Offline } from 'react-detect-offline'
 import { debounce } from 'lodash'
 
 import 'antd/dist/reset.css'
 import './app.css'
 
+import Services from '../../services/services'
 import MovieList from '../movie-list/movie-list'
 import Spinner from '../spinner/spinner'
 import ErrorIndicator from '../error-indicator/error-indicator'
 import SearchMovies from '../search-movies/search-movies'
 import PaginationList from '../pagination/pagination'
-import { ServiceProvider } from '../services/services-context'
+import { ServiceProvider } from '../../services-context/services-context'
 
 export default class App extends Component {
+  services = new Services()
+
   state = {
     movieData: [],
     newMovieData: [],
@@ -26,10 +29,6 @@ export default class App extends Component {
     guestSessionId: '',
   }
 
-  click = e => {
-    this.setState({ value: e.target.value })
-  }
-
   onError = () => {
     this.setState({
       error: true,
@@ -37,114 +36,94 @@ export default class App extends Component {
     })
   }
 
-  func = url => {
-    fetch(url)
-      .then(response => response.json())
-      .then(response => {
+  getFilms = page => {
+    this.services
+      .getAllFilms(page)
+      .then(res => {
         this.setState({
-          movieData: response.results,
+          movieData: res.results,
           loading: false,
-          currentPage: response.total_pages,
+          currentPage: res.total_pages,
         })
       })
       .catch(this.onError)
   }
 
-  componentDidMount = (page = 1) => {
+  componentDidMount = () => {
     this.getGenresId()
     this.guestSession()
-
-    this.func(`https://api.themoviedb.org/3/trending/movie/day?api_key=a018f4609f3a0dfc6bc8469fe19dc494&page=${page}`)
+    this.getFilms()
   }
 
-  componentWillUnmount = () => {
-    this.guestSession()
-    this.getGenresId()
-    this.func()
-  }
-
-  searchMoviesFunc = debounce(value => {
-    this.func(
-      `https://api.themoviedb.org/3/search/movie?api_key=a018f4609f3a0dfc6bc8469fe19dc494&query=${value.target.value}&include_adult=true&language=en-US&page=1`
-    )
+  searchMovies = debounce(value => {
+    this.services
+      .searchAllMovies(value)
+      .then(res => {
+        this.setState({
+          movieData: res.results,
+          currentPage: res.total_pages,
+        })
+      })
+      .catch(this.onError)
   }, 1000)
 
   guestSession = () => {
-    fetch('https://api.themoviedb.org/3/authentication/guest_session/new?api_key=a018f4609f3a0dfc6bc8469fe19dc494')
-      .then(response => response.json())
-      .then(response => {
+    this.services
+      .createQuestSession()
+      .then(res => {
         this.setState({
-          guestSessionId: response.guest_session_id,
+          guestSessionId: res.guest_session_id,
         })
       })
-
       .catch(this.onError)
   }
 
   getGenresId = () => {
-    fetch('https://api.themoviedb.org/3/genre/movie/list?api_key=a018f4609f3a0dfc6bc8469fe19dc494')
-      .then(response => response.json())
-      .then(response => {
+    this.services
+      .getAllGenresId()
+      .then(res => {
         this.setState({
-          genres: response.genres,
+          genres: res.genres,
         })
       })
       .catch(this.onError)
   }
 
-  postRated = id => {
-    fetch(
-      `https://api.themoviedb.org/3/movie/${id}/rating?api_key=a018f4609f3a0dfc6bc8469fe19dc494&guest_session_id=${this.state.guestSessionId}`,
-      {
-        method: 'POST',
-        headers: {
-          accept: 'application/json',
-          'Content-Type': 'application/json;charset=utf-8',
-        },
-        body: '{"value":8.5}',
-      }
-    )
-      .then(response => response.json())
-
-      .catch(this.onError)
-  }
-
   getRated = () => {
-    fetch(
-      `https://api.themoviedb.org/3/guest_session/${this.state.guestSessionId}/rated/movies?api_key=a018f4609f3a0dfc6bc8469fe19dc494&language=en`
-    )
-      .then(response => response.json())
-      .then(response => {
+    this.services
+      .getAllRated(this.state.guestSessionId)
+      .then(res => res.json())
+      .then(res => {
         this.setState({
-          newMovieData: response.results,
+          newMovieData: res.results,
           loading: false,
-          currentPageRated: response.total_pages,
+          currentPageRated: res.total_pages,
         })
       })
       .catch(this.onError)
   }
 
   render() {
-    const { movieData, loading, error, currentPage, newMovieData, genres } = this.state
+    const { movieData, loading, error, currentPage, newMovieData, genres, guestSessionId } = this.state
 
     const hasData = !(loading || error)
 
     const spinner = loading ? <Spinner /> : null
-    const content = hasData ? <MovieList films={movieData} click={this.postRated} /> : null
+    const content = hasData ? (
+      <MovieList films={movieData} postRated={this.services.postRated} guestSessionId={guestSessionId} />
+    ) : null
 
     const contentRated = hasData ? <MovieList films={newMovieData} /> : null
 
     const errorMessage = error ? <ErrorIndicator /> : null
-    const search = hasData ? <SearchMovies search={this.searchMoviesFunc} /> : null
-    const pagination = hasData ? (
-      <PaginationList currentPage={currentPage} clickPagination={this.componentDidMount} />
-    ) : null
+    const search = hasData ? <SearchMovies search={this.searchMovies} /> : null
+    const pagination = hasData ? <PaginationList currentPage={currentPage} getFilms={this.getFilms} /> : null
 
     const items = [
       {
         key: '1',
         label: 'Search',
-        children: [spinner, search, content],
+        children: [spinner, search, content, pagination],
       },
       {
         key: '2',
@@ -156,13 +135,10 @@ export default class App extends Component {
     return (
       <>
         <ServiceProvider value={genres}>
-          <Online>
-            <Flex justify="space-around">
-              <Tabs defaultActiveKey="1" items={items} centered onChange={this.getRated} />
-            </Flex>
-            {errorMessage}
-            {pagination}
-          </Online>
+          <Flex justify="space-around">
+            <Tabs defaultActiveKey="1" items={items} centered onChange={this.getRated} />
+          </Flex>
+          {errorMessage}
         </ServiceProvider>
         <Offline>
           <ErrorIndicator />

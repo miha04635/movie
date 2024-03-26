@@ -23,6 +23,7 @@
 
   "plugins": ["react", "prettier", "import"],
   "rules": {
+    "no-underscore-dangle": "off",
     "camelcase": "off",
     "class-methods-use-this": "off",
     "no-plusplus": 0,

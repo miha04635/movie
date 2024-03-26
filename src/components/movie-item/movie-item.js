@@ -7,7 +7,7 @@ import ReleaseDate from '../release-date/release-date'
 import Genre from '../genre/genre'
 import MovieTitle from '../movie-title/movie-title'
 import MoviePreview from '../movie-preview/movie-preview'
-import { ServiceConsumer } from '../services/services-context'
+import { ServiceConsumer } from '../../services-context/services-context'
 import './movie-item.css'
 
 export default class MovieItem extends Component {
@@ -25,7 +25,7 @@ export default class MovieItem extends Component {
   }
 
   render() {
-    const { title, overview, release_date, backdrop_path, voteAverage, click, genre_ids } = this.props
+    const { title, overview, release_date, backdrop_path, voteAverage, postRated, genre_ids } = this.props
 
     return (
       <Card className="card">
@@ -46,7 +46,7 @@ export default class MovieItem extends Component {
             <ReleaseDate release_date={release_date} />
             <ServiceConsumer>{genres => <Genre value={genres} id={genre_ids} />}</ServiceConsumer>
             <AboutFilm overview={overview} />
-            <Rate allowHalf count={10} onChange={click}></Rate>
+            <Rate allowHalf count={10} onChange={postRated}></Rate>
           </Flex>
         </Flex>
       </Card>

@@ -1,3 +1,11 @@
 .movieList {
-	padding-top: 16px;
+  padding-top: 16px;
+  max-width: 1070px;
+  min-width: 500px;
+}
+
+@media screen and (max-width: 1040px) {
+  .movieList {
+    max-width: 500px;
+  }
 }
