@@ -7,8 +7,8 @@ const MoviePreview = ({ posterPath }) => {
   const URL = 'https://image.tmdb.org/t/p/original'
   if (!posterPath) {
     return (
-      <div className="box">
-        <img alt="фото" className="stub" />
+      <div className="boxStub">
+        <img alt="фото" className="stub" src="https://placehold.co/160x280?text=no\nimage" />
       </div>
     )
   }

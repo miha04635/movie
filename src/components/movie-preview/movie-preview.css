@@ -16,6 +16,6 @@
   object-fit: cover;
 }
 
-.stub {
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3c?xml version='1.0' encoding='UTF-8'?%3e%3csvg xmlns='http://www.w3.org/2000/svg' width='906' height='979' viewBox='0 0 906 979' fill='none'%3e%3cpath d='M58.1013 352.787C-42.398 623.787 2.1017 879.919 86.1035 943.787C146.603 989.787 242.565 997.122 305.604 919.787C386.711 820.287 563.604 508.788 905.604 681.787C916.104 -78.213 272.225 -224.603 58.1013 352.787Z' fill='url(%23paint0_linear)'%3e%3c/path%3e%3cdefs%3e%3clinearGradient id='paint0_linear' x1='-169.5' y1='1147' x2='782' y2='467.5' gradientUnits='userSpaceOnUse'%3e%3cstop stop-color='%235A0CA8'%3e%3c/stop%3e%3cstop offset='1' stop-color='%235A0CA8' stop-opacity='0'%3e%3c/stop%3e%3c/linearGradient%3e%3c/defs%3e%3c/svg%3e ");
+.boxStub {
+  margin-right: 8px;
 }
