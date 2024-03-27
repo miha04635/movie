@@ -8,6 +8,7 @@ import './app.css'
 
 import Services from '../../services/services'
 import MovieList from '../movie-list/movie-list'
+import MovieListRated from '../movie-list-rated/movie-list-rated'
 import Spinner from '../spinner/spinner'
 import ErrorIndicator from '../error-indicator/error-indicator'
 import SearchMovies from '../search-movies/search-movies'
@@ -17,16 +18,18 @@ import { ServiceProvider } from '../../services-context/services-context'
 export default class App extends Component {
   services = new Services()
 
+  guestSessionId = localStorage.getItem('guestSessionId')
+
   state = {
     movieData: [],
     newMovieData: [],
     loading: true,
-    loadingRated: true,
     error: false,
-    value: '',
     currentPage: 1,
     genres: [],
-    guestSessionId: '',
+    statusCode: '',
+    searchStatus: false,
+    value: '',
   }
 
   onError = () => {
@@ -37,16 +40,18 @@ export default class App extends Component {
   }
 
   getFilms = page => {
-    this.services
-      .getAllFilms(page)
-      .then(res => {
-        this.setState({
-          movieData: res.results,
-          loading: false,
-          currentPage: res.total_pages,
+    if (!this.state.searchStatus) {
+      this.services
+        .getAllFilms(page)
+        .then(res => {
+          this.setState({
+            movieData: res.results,
+            loading: false,
+            currentPage: res.total_pages,
+          })
         })
-      })
-      .catch(this.onError)
+        .catch(this.onError)
+    }
   }
 
   componentDidMount = () => {
@@ -55,9 +60,24 @@ export default class App extends Component {
     this.getFilms()
   }
 
-  searchMovies = debounce(value => {
+  searchMovies = () =>
+    debounce(value => {
+      this.services
+        .searchAllMovies(value)
+        .then(res => {
+          this.setState({
+            movieData: res.results,
+            currentPage: res.total_pages,
+            searchStatus: true,
+            value,
+          })
+        })
+        .catch(this.onError)
+    }, 1000)
+
+  searchMoviesPagination = page => {
     this.services
-      .searchAllMovies(value)
+      .searchAllMovies(this.state.value, page)
       .then(res => {
         this.setState({
           movieData: res.results,
@@ -65,16 +85,18 @@ export default class App extends Component {
         })
       })
       .catch(this.onError)
-  }, 1000)
+  }
 
   guestSession = () => {
     this.services
       .createQuestSession()
       .then(res => {
-        this.setState({
-          guestSessionId: res.guest_session_id,
-        })
+        if (this.guestSessionId) {
+          return null
+        }
+        return localStorage.setItem('guestSessionId', res.guest_session_id)
       })
+
       .catch(this.onError)
   }
 
@@ -89,22 +111,26 @@ export default class App extends Component {
       .catch(this.onError)
   }
 
-  getRated = () => {
-    this.services
-      .getAllRated(this.state.guestSessionId)
-      .then(res => res.json())
-      .then(res => {
-        this.setState({
-          newMovieData: res.results,
-          loading: false,
-          currentPageRated: res.total_pages,
+  getRated = key => {
+    if (key === '2') {
+      this.services
+        .getAllRated(localStorage.getItem('guestSessionId'))
+        .then(res => res.json())
+        .then(res => {
+          this.setState({
+            statusCode: res.status_code,
+            newMovieData: res.results,
+            loading: false,
+            currentPageRated: res.total_pages,
+          })
         })
-      })
-      .catch(this.onError)
+        .catch(this.onError)
+    }
   }
 
   render() {
-    const { movieData, loading, error, currentPage, newMovieData, genres, guestSessionId } = this.state
+    const { movieData, loading, error, currentPage, newMovieData, genres, guestSessionId, statusCode, searchStatus } =
+      this.state
 
     const hasData = !(loading || error)
 
@@ -113,11 +139,18 @@ export default class App extends Component {
       <MovieList films={movieData} postRated={this.services.postRated} guestSessionId={guestSessionId} />
     ) : null
 
-    const contentRated = hasData ? <MovieList films={newMovieData} /> : null
+    const contentRated = hasData ? <MovieListRated films={newMovieData} statusCode={statusCode} /> : null
 
     const errorMessage = error ? <ErrorIndicator /> : null
     const search = hasData ? <SearchMovies search={this.searchMovies} /> : null
-    const pagination = hasData ? <PaginationList currentPage={currentPage} getFilms={this.getFilms} /> : null
+    const pagination = hasData ? (
+      <PaginationList
+        currentPage={currentPage}
+        getFilms={this.getFilms}
+        searchMoviesPagination={this.searchMoviesPagination}
+        searchStatus={searchStatus}
+      />
+    ) : null
 
     const items = [
       {

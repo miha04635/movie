@@ -5,6 +5,10 @@ export default class Services {
 
   async getResource(url) {
     const res = await fetch(`${this._abiBase}${url}`)
+
+    if (!res.ok) {
+      return null
+    }
     return res.json()
   }
 
@@ -12,9 +16,9 @@ export default class Services {
     return this.getResource(`/trending/movie/day?api_key=${this._apiKey}&page=${page}`)
   }
 
-  searchAllMovies(value) {
+  searchAllMovies(value, page = 1) {
     return this.getResource(
-      `/search/movie?api_key=${this._apiKey}&query=${value.target.value}&include_adult=true&language=en-US&page=${1}`
+      `/search/movie?api_key=${this._apiKey}&query=${value.target.value}&include_adult=true&language=en-US&page=${page}`
     )
   }
 
@@ -26,13 +30,15 @@ export default class Services {
     return this.getResource(`/genre/movie/list?api_key=${this._apiKey}`)
   }
 
-  getAllRated(guestSessionId) {
-    return fetch(`${this._abiBase}/guest_session/${guestSessionId}/rated/movies?api_key=${this._apiKey}&language=en-US`)
+  getAllRated() {
+    return fetch(
+      `${this._abiBase}/guest_session/${localStorage.getItem('guestSessionId')}/rated/movies?api_key=${this._apiKey}&language=en-US`
+    )
   }
 
-  postRated = (id, guestSessionId) => {
+  postRated = id => {
     const res = fetch(
-      `${this._abiBase}/movie/${id}/rating?api_key=${this._apiKey}&guest_session_id=${guestSessionId}`,
+      `${this._abiBase}/movie/${id}/rating?api_key=${this._apiKey}&guest_session_id=${localStorage.getItem('guestSessionId')}`,
       {
         method: 'POST',
         headers: {

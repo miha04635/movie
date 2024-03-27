@@ -5,15 +5,21 @@ import 'antd/dist/reset.css'
 import MovieItem from '../movie-item/movie-item'
 import './movie-list.css'
 
-const MovieList = ({ films, postRated, guestSessionId }) => {
+const MovieList = ({ films, postRated }) => {
   if (!films) {
     return null
   }
+
   const elements = films.map(item => {
     const { id, vote_average, ...itemProps } = item
 
     return (
-      <MovieItem key={id} {...itemProps} postRated={() => postRated(id, guestSessionId)} voteAverage={vote_average} />
+      <MovieItem
+        key={id}
+        {...itemProps}
+        postRated={() => postRated(id, localStorage.getItem('guestSessionId'))}
+        voteAverage={vote_average}
+      />
     )
   })
 

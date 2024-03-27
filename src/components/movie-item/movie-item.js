@@ -2,10 +2,8 @@ import { Component } from 'react'
 import { Card, Flex, Typography, Rate } from 'antd'
 
 import 'antd/dist/reset.css'
-import AboutFilm from '../about-film/about-film'
 import ReleaseDate from '../release-date/release-date'
 import Genre from '../genre/genre'
-import MovieTitle from '../movie-title/movie-title'
 import MoviePreview from '../movie-preview/movie-preview'
 import { ServiceConsumer } from '../../services-context/services-context'
 import './movie-item.css'
@@ -27,13 +25,18 @@ export default class MovieItem extends Component {
   render() {
     const { title, overview, release_date, backdrop_path, voteAverage, postRated, genre_ids } = this.props
 
+    let text = overview.slice(0, 150)
+    if (text.length < overview.length) {
+      text += '...'
+    }
+
     return (
       <Card className="card">
         <Flex justify="space-between">
           <MoviePreview posterPath={backdrop_path} />
           <Flex vertical align="flex-start" justify="space-around">
             <Typography.Title level={4}>
-              <MovieTitle title={title} />
+              <div className="title">{title}</div>
             </Typography.Title>
             <div
               className="filmRating"
@@ -45,7 +48,9 @@ export default class MovieItem extends Component {
             </div>
             <ReleaseDate release_date={release_date} />
             <ServiceConsumer>{genres => <Genre value={genres} id={genre_ids} />}</ServiceConsumer>
-            <AboutFilm overview={overview} />
+            <div className="aboutFilm">
+              <p className="aboutText">{text}</p>
+            </div>
             <Rate allowHalf count={10} onChange={postRated}></Rate>
           </Flex>
         </Flex>
