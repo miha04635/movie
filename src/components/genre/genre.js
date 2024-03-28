@@ -3,6 +3,10 @@ import React from 'react'
 import './genre.css'
 
 const Genre = ({ value, id }) => {
+  if (value.length === 0) {
+    return null
+  }
+
   const genreList = id.map(itemId => {
     const results = value.find(item2 => item2.id === itemId)
     return results.name

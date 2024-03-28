@@ -7,8 +7,9 @@ export default class Services {
     const res = await fetch(`${this._abiBase}${url}`)
 
     if (!res.ok) {
-      return null
+      return res.status
     }
+
     return res.json()
   }
 
