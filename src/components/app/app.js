@@ -104,9 +104,6 @@ export default class App extends Component {
     this.services
       .getAllGenresId()
       .then(res => {
-        if (res === 404) {
-          this.onError()
-        }
         this.setState({
           genres: res.genres,
         })
